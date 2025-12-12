@@ -38,6 +38,65 @@ body{
   --radius: 10px;
 }
 
+.mobile-toggle {
+  display: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--light-text);
+  background: none;
+  border: none;
+}
+
+
+@media (max-width: 768px) {
+  header {
+    padding: 12px 18px;
+    flex-wrap: nowrap;
+  }
+
+  nav {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    background: var(--primary);
+    width: 180px;
+    padding: 15px 0;
+    display: none;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+    border-radius: 0 0 0 12px;
+  }
+
+  nav a {
+    margin: 10px 0;
+    padding: 8px 20px;
+    font-size: 1.1rem;
+    display: block;
+    text-align: left;
+  }
+
+
+  .mobile-toggle {
+    display: block;
+  }
+
+ 
+  .lt {
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cn a {
+    font-size: 1.3rem;
+  }
+
+
+  nav.active {
+    display: flex;
+  }
+}
+
+
 
 * {
   margin: 0;
@@ -448,3 +507,4 @@ footer {
 
     
     
+
