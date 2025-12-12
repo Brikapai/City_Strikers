@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login | City Strikers</title>
+  <link rel="icon" type="images/x-icon" href="favicon.ico"/>
+  <link rel="stylesheet" href="stylee.css" />
+  <style>
+    @media (max-width: 600px) {
+      .login-card { padding: 20px; }
+      .login-wrap { margin: 28px auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="lt">
+      <img src="iconclear.png" alt="Club Logo" class="clublogo">
+      <span class="cn"><a href="Home.html">City Strikers Club</a></span>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="discussion.html">Discussion</a>
+      <a href="schedule.html">Upcoming Schedule</a>
+      <a href="teams.html">Team Stats</a>
+      <a href="login.html"><button style="padding:6px 14px; font-size:0.9rem;">Login</button></a>
+    </nav>
+  </header>
+
+  <main class="login-wrap">
+    <section>
+      <div class="card login-card">
+        <h2>Log in</h2>
+
+        <form id="loginForm" novalidate>
+          <div class="form-row">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Full name or username">
+            <div id="nameError" class="error" style="font-weight:600;margin-top:6px"></div>
+          </div>
+
+          <div class="form-row">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            <div id="emailError" class="error" style="font-weight:600;margin-top:6px"></div>
+          </div>
+
+          <div class="form-row">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="your password" required>
+            <div id="passwordError" class="error" style="font-weight:600;margin-top:6px"></div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-primary">Submit</button>
+          </div>
+
+          <p id="message" role="status" aria-live="polite" class="small"></p>
+        </form>
+      </div>
+
+      <div class="card small-cta">
+        <h4 style="margin:0 0 8px 0">New User?</h4>
+        <a href="joinform.html">Join the Club</a>
+      </div>
+    </section>
+  </main>
+<footer>  
+<p>&copy; 2025 Local Sports Club. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    (function() {
+      const form = document.getElementById('loginForm');
+      const msg = document.getElementById('message');
+
+      function clearErrors() {
+        document.getElementById("nameError").textContent = "";
+        document.getElementById("emailError").textContent = "";
+        document.getElementById("passwordError").textContent = "";
+        msg.textContent = "";
+        msg.className = 'small';
+      }
+
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+      function getStoredUsers(){
+        try {
+          const raw = localStorage.getItem('sportsClubUsers');
+          return raw ? JSON.parse(raw) : [];
+        } catch(e) {
+          return [];
+        }
+      }
+
+      function encodePassword(pwd){
+        try { return btoa(pwd); }
+        catch(e) { return pwd; }
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearErrors();
+
+        let isValid = true;
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        if (email === "") {
+          document.getElementById("emailError").textContent = "Email is required.";
+          isValid = false;
+        } else if (!emailPattern.test(email)) {
+          document.getElementById("emailError").textContent = "Invalid email format.";
+          isValid = false;
+        }
+
+        if (!password) {
+          document.getElementById("passwordError").textContent = "Password is required.";
+          isValid = false;
+        } else if (password.length < 6) {
+          document.getElementById("passwordError").textContent = "Password must be at least 6 characters.";
+          isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const users = getStoredUsers();
+        const byEmail = users.find(u => u.email === email.toLowerCase());
+        let user = byEmail || null;
+
+        if (!user && name) {
+          const lowerName = name.toLowerCase();
+          user = users.find(u =>
+            (u.username && u.username.toLowerCase() === lowerName) ||
+            (u.fullName && u.fullName.toLowerCase() === lowerName)
+          );
+        }
+
+        if (!user) {
+          msg.textContent = 'No account found with that email (or name).';
+          msg.className = 'small error';
+          return;
+        }
+
+        const encoded = encodePassword(password);
+        if (encoded === user.password) {
+          try {
+            localStorage.setItem('sportsClubSession', JSON.stringify({ userId: user.id, loggedAt: Date.now() }));
+          } catch(e) { /* ignore */ }
+
+          msg.textContent = 'Login successful — redirecting to Home...';
+          msg.className = 'small success';
+
+          setTimeout(() => { window.location.href = 'index.html'; }, 700);
+        } else {
+          msg.textContent = 'Incorrect password.';
+          msg.className = 'small error';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

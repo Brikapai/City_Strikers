@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Join the Club | City Strikers</title>
+  <link rel="icon" type="images/x-icon" href="favicon.ico"/>
+  <link rel="stylesheet" href="stylee.css" />
+  <style>
+    .join-container {
+      max-width: 520px;
+      margin: 60px auto;
+      background: var(--card-bg);
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .form-row { margin-bottom: 12px; }
+    label { display:block; font-weight:600; margin-bottom:6px; }
+    input, select { width:100%; padding:10px; border-radius:8px; border:1px solid #e4e7eb; }
+    .small { font-size:0.9rem; color:gray; margin-top:6px; }
+    .success { color: #0b6b3a; font-weight:600; }
+    .error { color: #b00020; font-weight:600; }
+  </style>
+</head>
+<body>
+  <header>
+     <div class="lt">
+    <img src="iconclear.png" alt="Club Logo" class="clublogo">
+    <span class="cn"><a href="Home.html">City Strikers Club</a></span></div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="discussion.html">Discussion</a>
+      <a href="schedule.html">Upcoming Schedule</a>
+      <a href="login.html"><button style="padding:6px 14px; font-size:0.9rem;">Login</button></a>
+    </nav>
+  </header>
+
+  <section>
+    <div class="join-container">
+      <h2>Join the Club</h2>
+      <p class="small">Create an account so you can post in the discussion, register for events and access member features.</p>
+
+      <form id="joinForm">
+        <div class="form-row">
+          <label for="fullName">Full Name</label>
+          <input id="fullName" name="fullName" type="text" required placeholder="Your full name">
+        </div>
+
+        <div class="form-row">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="you@example.com">
+        </div>
+
+        <div class="form-row">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" required placeholder="choose a username">
+        </div>
+
+        <div class="form-row">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required placeholder="at least 6 characters">
+        </div>
+
+        <div class="form-row">
+          <label for="favoriteTeam">Favorite Team</label>
+          <select id="favoriteTeam" name="favoriteTeam">
+            <option value="">-- Select --</option>
+            <option>Falcons FC</option>
+            <option>Thunder Hoopers</option>
+            <option>Royal Strikers</option>
+            <option>Spike Masters</option>
+            <option>Smash Warriors</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button type="submit">Create Account</button>
+          <button type="button" id="clearBtn" class="btn-secondary">Clear</button>
+        </div>
+
+        <p id="message" class="small" style="margin-top:12px;"></p>
+      </form>
+
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Local Sports Club. All Rights Reserved.</p>
+  </footer>
+<script>
+    // Very simple client-side account storage using localStorage.
+    // NOT secure for production. This is for demo/assignment purposes only.
+
+    const form = document.getElementById('joinForm');
+    const message = document.getElementById('message');
+    const clearBtn = document.getElementById('clearBtn');
+
+    // Helper: get stored users (array)
+    function getStoredUsers(){
+      try{
+        const raw = localStorage.getItem('sportsClubUsers');
+        return raw ? JSON.parse(raw) : [];
+      }catch(e){ return []; }
+    }
+
+    // Helper: save users array
+    function saveUsers(users){
+      localStorage.setItem('sportsClubUsers', JSON.stringify(users));
+    }
+
+    // Simple (insecure) string obfuscation for password using btoa. For demo only.
+    function obfuscatePassword(pwd){
+      try{ return btoa(pwd); }catch(e){ return pwd; }
+    }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      message.textContent = '';
+
+      const fullName = form.fullName.value.trim();
+      const email = form.email.value.trim().toLowerCase();
+      const username = form.username.value.trim();
+      const password = form.password.value;
+      const favoriteTeam = form.favoriteTeam.value;
+
+      if(password.length < 6){
+        message.textContent = 'Password must be at least 6 characters.';
+        message.className = 'error';
+        return;
+      }
+
+      const users = getStoredUsers();
+
+      // Check for duplicate email or username
+      if(users.some(u => u.email === email)){
+        message.textContent = 'An account with that email already exists.';
+        message.className = 'error';
+        return;
+      }
+      if(users.some(u => u.username === username)){
+        message.textContent = 'Username already taken. Choose another.';
+        message.className = 'error';
+        return;
+      }
+
+      const newUser = {
+        id: Date.now(),
+        fullName,
+        email,
+        username,
+        password: obfuscatePassword(password),
+        favoriteTeam,
+      };
+
+      users.push(newUser);
+      saveUsers(users);
+
+      message.textContent = 'Account created successfully! Redirecting to login...';
+      message.className = 'success';
+
+      // small delay then redirect to login page so user sees message
+      setTimeout(() => { window.location.href = 'login.html'; }, 1000);
+    });
+
+    clearBtn.addEventListener('click', function(){
+      form.reset();
+      message.textContent = '';
+    });
+  </script>
+ 
+  
+</body>
+</html>
